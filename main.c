@@ -1,30 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int main()
+int main(int argc, char *argv[])
 {
     int n = 0;                                              // счетчик прочитанных байтов
     int NumOfByte = 0;                                      // колличество прочитанных байтов при определении Jpeg файла
-    unsigned char Buff[4] = {0, 0, 0, 0};                   // приемный буфер для поиска совпадений в файле
+    unsigned char Buff[4] = {0};                            // приемный буфер для поиска совпадений в файле
     unsigned char MarkEOJPG[2] = {0xff, 0xd9};              // маркер конца jpg файла
     unsigned char SignLFH[4] = {0x50, 0x4b, 0x03, 0x04};    // Сигнатура Local file header
 
-
-    // Вводим имя файла из директории программы
-    printf("Please enter a filename in the following format: \"NAME.TYPE\" and press ENTER\n");
-    char FileNameForScan[100];
-    scanf("%s", FileNameForScan);
-    //printf("\n%s", FileNameForScan);
-
-    FILE *f;
-
-    f = fopen(FileNameForScan, "rb");
+    FILE *f = fopen(argv[1], "rb");;
 
     if(f == NULL)
     {
         printf("Error opening file\n");
-        printf("\n\nPress 'e' to exit\n");
-        while(getch() != 'e');
         exit(1);
     }
 
@@ -43,7 +33,6 @@ int main()
         fseek(f, -1, SEEK_CUR); // смещаем положение указателя ч/з назад на один байт
         n -= 1;
     }
-    fclose(f);
 
     if(NumOfByte == n)
         printf("\nThis is the non-zipjpeg file\n\n");
@@ -51,14 +40,7 @@ int main()
     //printf("%d\t%d\n", NumOfByte, n);
 
 
-    f = fopen(FileNameForScan, "rb");
-    if(f == NULL)
-    {
-        printf("Error opening file\n");
-        printf("\n\nPress 'e' to exit\n");
-        while(getch() != 'e');
-        exit(1);
-    }
+    fseek(f, 0, SEEK_SET); // смещаем положение указателя ч/з в начало
 
     //Сканируем файл на предмет совпадения сигнатуры Local file header. Если нашли совпадение, выводим на экран содержимое zip файла.
     while(1)
@@ -87,9 +69,6 @@ int main()
         n -= 3;                                                 // и также уменьшаем количество прочитанных байтов
     }
     fclose(f);
-
-    printf("\nPress 'e' to exit\n");
-    while(getch() != 'e');
 
     return 0;
 }
